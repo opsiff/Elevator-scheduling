@@ -2,65 +2,20 @@
 #include<cstdio>
 #include<cstdlib>
 #include"elevator.h"
+#include"control_table.h"
 using namespace std;
 int floor_num = 3;
 int start_floor = 0;
-class control_table {
-private:
-	int state;//1.空载，2.有客
-
-public:
-	int aim[11];
-	control_table() {
-		state = 1;
-		for (int i = 0; i <= 10; i++) {
-			aim[i] = 0;
-		}
-	};
-	int ask_for_state();
-	int update_state(int floor);
-	int downdate_state(int floor);
-	~control_table() {};
-};
-
-int control_table::ask_for_state() {
-	return state;
-}
-int control_table::update_state(int floor) {
-	if (floor == -1) {
-		state = 1;
-		return 0;
-	}
-	else {
-		state = 2;
-		aim[floor] = 1;
-		return 1;
-	}
-}
-int control_table::downdate_state(int floor) {
-	aim[floor] = 0;
-	bool k = 0;
-	for (int i = 0; i <= 10; i++) {
-		if (aim[i] == 1)
-			k = 1;
-	}
-	if (k == 0)
-		state = 1;
-	return 1;
-}
-int abs(int k) {
-	return (k > 0) ? k : (-k);
-}
-//时间从零开始，有五个人
+//时间从零开始，有n个人
 int Global_time = 0, n;
 control_table control1;
 elevator elevator1;
 struct passenger {
-	int req_time, req_place_fr, req_place_to;
-	int /*req_wait_time_long,*/req_arrive_time = 100;
+	int req_time,get_time, req_place_fr, req_place_to;
+	int req_arrive_time;
 	int use, leave;
 };
-struct passenger passengerL[6];
+struct passenger passengerL[501];
 void check_data() {
 	for (int i = start_floor; i <= floor_num; i++) {
 		if (passengerL[i].req_time<0 || passengerL[i].req_place_fr<0 || passengerL[i].req_place_to<0) {
@@ -99,7 +54,7 @@ int find_passenger() {
 	if (check_queue_use() != 0) {
 		int passengermin = 100000;
 		int passengerminn = -1;
-		for (int i = 1; i <= 5; i++) {
+		for (int i = 1; i <= n; i++) {
 			if (passengerL[i].req_time<passengermin&&passengerL[i].use == 0) {
 				passengermin = passengerL[i].req_time;
 				passengerminn = i;
@@ -184,7 +139,6 @@ void run() {
 			control1.update_state(passengerL[person].req_place_fr);
 		}
 	}
-
 	//移动中途+中途接客/下客
 	//    cout << "fget " << find_passenger() << " "<<find_aim_place(elevator1.state())<<endl;
 	while (elevator1.state() != find_aim_place(elevator1.state())) {
@@ -195,6 +149,7 @@ void run() {
 			int temp_passenger = find_passenger();//防止重复调用
 												  //    cout << "get " << temp_passenger << endl;
 			passengerL[temp_passenger].use = 1;//已经响应
+			passengerL[temp_passenger].get_time = Global_time + 1;//上梯时间
 			control1.update_state(passengerL[temp_passenger].req_place_to);//按下目的楼层按钮
 			elevator1.get(1);//电梯加人
 		}
@@ -220,6 +175,7 @@ void run() {
 		int temp_passenger = find_passenger();//防止重复调用
 											  //  cout << "get " << temp_passenger << endl;
 		passengerL[temp_passenger].use = 1;//已经响应
+		passengerL[temp_passenger].get_time = Global_time + 1;//上梯时间
 		control1.update_state(passengerL[temp_passenger].req_place_to);//按下目的楼层按钮
 		elevator1.get(1);//电梯加人
 	}
@@ -229,6 +185,7 @@ void run() {
 }
 void out() {
 	int temp = 0;
+	cout << passengerL[1].get_time << " " << passengerL[1].req_place_fr<<"\n";
 	for (int i = 1; i <= n; i++) {
 		temp = temp + (passengerL[i].req_arrive_time - passengerL[i].req_time);
 		// cout << passengerL[i].req_arrive_time<< " " << passengerL[i].req_time<<" "<<passengerL[i].req_place_to<<"\n";
@@ -248,6 +205,5 @@ int main() {
 		run();
 	}
 	out();
-	while(1);
 	return 0;
 }
