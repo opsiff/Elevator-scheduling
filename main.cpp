@@ -193,7 +193,7 @@ void out() {
 	for (int i = 1; i <= n; i++) {
 		temp = temp + (passengerL[i].req_arrive_time - passengerL[i].req_time);
 		// cout << passengerL[i].req_arrive_time<< " " << passengerL[i].req_time<<" "<<passengerL[i].req_place_to<<"\n";
-		out << passengerL[i].req_arrive_time << " " << passengerL[i].req_place_to << " \n";
+		out << passengerL[i].req_arrive_time << " " << passengerL[i].req_place_to << "\n";
 	}
 		out.close();
 	//cout << temp << "\n";
