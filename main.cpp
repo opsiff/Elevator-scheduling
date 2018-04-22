@@ -1,4 +1,5 @@
 #include<iostream>
+#include<fstream>
 #include<cstdio>
 #include<cstdlib>
 #include"elevator.h"
@@ -24,14 +25,16 @@ void check_data() {
 		}
 	}
 }
-void in() {
+void begin() {
+	ifstream in("input.txt");
+	in >> n;
 	for (int i = 0; i < n+1; i++) {
 		passengerL[i].use = 0; passengerL[i].leave = 0;
 	}
 	for (int i = 1; i <= n; i++) {
-		cin >> passengerL[i].req_time;
-		cin >> passengerL[i].req_place_fr;
-		cin >> passengerL[i].req_place_to;
+		in >> passengerL[i].req_time;
+		in >> passengerL[i].req_place_fr;
+		in >> passengerL[i].req_place_to;
 		/*if (passengerL[i].req_place_to == 0)
 			passengerL[i].req_place_to = 10;
 		if (passengerL[i].req_place_fr == 0)
@@ -185,19 +188,20 @@ void run() {
 }
 void out() {
 	int temp = 0;
-	cout << passengerL[1].get_time << " " << passengerL[1].req_place_fr<<"\n";
+	ofstream out("output.txt");
+	out << passengerL[1].get_time << " " << passengerL[1].req_place_fr<<"\n";
 	for (int i = 1; i <= n; i++) {
 		temp = temp + (passengerL[i].req_arrive_time - passengerL[i].req_time);
 		// cout << passengerL[i].req_arrive_time<< " " << passengerL[i].req_time<<" "<<passengerL[i].req_place_to<<"\n";
-		cout << passengerL[i].req_arrive_time << " " << passengerL[i].req_place_to << " \n";
+		out << passengerL[i].req_arrive_time << " " << passengerL[i].req_place_to << " \n";
 	}
+		out.close();
 	//cout << temp << "\n";
 }
 int main() {
 	//freopen("input.txt", "r", stdin);
 	//freopen("output.txt", "w", stdout);
-	cin >> n;
-	in();
+	begin();
 	//int ff = 0;
 	//如果还有人的请求没被满足，电梯就继续开着
 	while (check_queue_use() != 0) {
